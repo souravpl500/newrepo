@@ -51,9 +51,9 @@ postRouter.get("/browseclassifieds", async (req, res) => {
   }
 });
 
-postRouter.get("/post", (req, res) => {
+postRouter.get("/post", async (req, res) => {
   const query = {};
-  let data =  PostModel.find();
+  let data = await PostModel.find();
 
   if (req.query.category) {
     query.category = req.query.category;
@@ -61,6 +61,7 @@ postRouter.get("/post", (req, res) => {
   if (req.query.search) {
     query.name = { $regex: req.query.search, $options: "i" };
   }
+  const { page = 1, limit = 4 } = req.query;
   data
     .find(query, (error, ads) => {
       if (error) {
@@ -70,8 +71,8 @@ postRouter.get("/post", (req, res) => {
       }
     })
     .sort({ postedAt: req.query.sort === "oldest" ? 1 : -1 })
-    .skip(parseInt(req.query.page) * 4)
-    .limit(4);
+    .limit(limit * 1)
+    .skip((page - 1) * limit);
 });
 
 postRouter.delete("/delete/:id", async (req, res) => {
