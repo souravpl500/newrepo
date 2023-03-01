@@ -18,7 +18,7 @@ postRouter.post("/postclassifieds", async (req, res) => {
 });
 
 postRouter.get("/browseclassifieds", async (req, res) => {
-  const { category = "", sort = "", name, page } = req.query;
+  const { category = "", sort = "", name } = req.query;
   try {
     let data = await PostModel.find();
 
@@ -27,36 +27,48 @@ postRouter.get("/browseclassifieds", async (req, res) => {
         return ele.category == category;
       });
       res.send(filterCategory);
+    } else if (sort) {
+      const sortDate = data.sort(function (a, b) {
+        return new Date(a.postedAt) - new Date(b.postedAt);
+      });
+      res.send(sortDate);
     } else if (name) {
       const { page = 1, limit = 4 } = req.query;
       let data = await PostModel.find({ name: { $regex: name, $options: "i" } })
         .limit(limit * 1)
         .skip((page - 1) * limit);
       res.send(data);
-    } else if (page) {
+    } else {
       const { page = 1, limit = 4 } = req.query;
       let data = await PostModel.find()
         .limit(limit * 1)
         .skip((page - 1) * limit);
       res.send(data);
-    } else if (sort) {
-      if (sort === "oldest") {
-        const sortDate = data.sort(function (a, b) {
-          return new Date(a.postedAt) - new Date(b.postedAt);
-        });
-        res.send(sortDate);
-      } else if (sort === "newest") {
-        const sortDate = data.sort(function (a, b) {
-          return new Date(b.postedAt) - new Date(a.postedAt);
-        });
-        res.send(sortDate);
-      }
     }
-
   } catch (err) {
     console.log("err :>> ", err);
     res.send({ err: err });
   }
+});
+
+postRouter.get("/post", (req, res) => {
+  const query = {};
+  if (req.query.category) {
+    query.category = req.query.category;
+  }
+  if (req.query.search) {
+    query.name = { $regex: req.query.search, $options: "i" };
+  }
+  Ad.find(query, (error, ads) => {
+    if (error) {
+      res.status(500).send(error);
+    } else {
+      res.send(ads);
+    }
+  })
+    .sort({ postedAt: req.query.sort === "oldest" ? 1 : -1 })
+    .skip(parseInt(req.query.page) * 4)
+    .limit(4);
 });
 
 postRouter.delete("/delete/:id", async (req, res) => {
