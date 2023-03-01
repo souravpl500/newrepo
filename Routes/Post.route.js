@@ -51,7 +51,7 @@ postRouter.get("/browseclassifieds", async (req, res) => {
   }
 });
 
-postRouter.get('/', (req, res) => {
+postRouter.get('/', async (req, res) => {
   const query = {};
   let data = await PostModel.find();
   if (req.query.category) {
