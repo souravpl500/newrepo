@@ -70,7 +70,7 @@ postRouter.get("/post", async (req, res) => {
       }
     })
     .sort({ postedAt: req.query.sort === "oldest" ? 1 : -1 })
-    .skip((parseInt(req.query.page)-1)* 4)
+    .skip(parseInt(req.query.page)* 4)
     .limit(4);
 });
 
