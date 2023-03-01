@@ -61,7 +61,6 @@ postRouter.get("/post", async (req, res) => {
   if (req.query.search) {
     query.name = { $regex: req.query.search, $options: "i" };
   }
-  const { page = 1, limit = 4 } = req.query;
   data
     .find(query, (error, ads) => {
       if (error) {
@@ -71,8 +70,8 @@ postRouter.get("/post", async (req, res) => {
       }
     })
     .sort({ postedAt: req.query.sort === "oldest" ? 1 : -1 })
-    .limit(limit * 1)
-    .skip((page - 1) * limit);
+    .skip((parseInt(req.query.page)-1)* 4)
+    .limit(4);
 });
 
 postRouter.delete("/delete/:id", async (req, res) => {
