@@ -27,6 +27,18 @@ postRouter.get("/browseclassifieds", async (req, res) => {
         return ele.category == category;
       });
       res.send(filterCategory);
+    } else if (name) {
+      const { page = 1, limit = 4 } = req.query;
+      let data = await PostModel.find({ name: { $regex: name, $options: "i" } })
+        .limit(limit * 1)
+        .skip((page - 1) * limit);
+      res.send(data);
+    } else if (page) {
+      const { page = 1, limit = 4 } = req.query;
+      let data = await PostModel.find()
+        .limit(limit * 1)
+        .skip((page - 1) * limit);
+      res.send(data);
     } else if (sort) {
       if (sort === "oldest") {
         const sortDate = data.sort(function (a, b) {
@@ -39,18 +51,6 @@ postRouter.get("/browseclassifieds", async (req, res) => {
         });
         res.send(sortDate);
       }
-    } else if (name) {
-      const { page = 1, limit = 4 } = req.query;
-      let data = await PostModel.find({ name: { $regex: name, $options: "i" } })
-        .limit(limit * 1)
-        .skip((page - 1) * limit);
-      res.send(data);
-    } else {
-      const { page = 1, limit = 4 } = req.query;
-      let data = await PostModel.find()
-        .limit(limit * 1)
-        .skip((page - 1) * limit);
-      res.send(data);
     }
   } catch (err) {
     console.log("err :>> ", err);
