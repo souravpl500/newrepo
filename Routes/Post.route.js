@@ -52,6 +52,7 @@ postRouter.get("/browseclassifieds", async (req, res) => {
         res.send(sortDate);
       }
     }
+
   } catch (err) {
     console.log("err :>> ", err);
     res.send({ err: err });
