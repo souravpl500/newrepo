@@ -18,7 +18,7 @@ postRouter.post("/postclassifieds", async (req, res) => {
 });
 
 postRouter.get("/browseclassifieds", async (req, res) => {
-  const { category = "", sort = "", name } = req.query;
+  const { category = "", sort = "", name, page } = req.query;
   try {
     let data = await PostModel.find();
 
